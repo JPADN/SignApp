@@ -2,10 +2,10 @@ package com.api.signapp.controllers;
 
 import org.bouncycastle.cms.CMSException;
 import org.bouncycastle.operator.OperatorCreationException;
-import org.example.SignerCertKey;
-import org.example.SigningUtilities;
-import org.example.exceptions.SignatureVerificationException;
-import org.example.exceptions.SigningException;
+import org.desafiobry.exceptions.SignatureVerificationException;
+import org.desafiobry.exceptions.SigningException;
+import org.desafiobry.signingutilities.SignerCertKey;
+import org.desafiobry.signingutilities.SigningUtilities;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
