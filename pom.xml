@@ -32,11 +32,11 @@
 			<version>1.58</version>
 		</dependency>
 		<dependency>
-			<groupId>org.example</groupId>
-			<artifactId>SigningUtilities</artifactId>
-			<version>1.0-SNAPSHOT</version>
+			<groupId>org.desafiobry</groupId>
+			<artifactId>signingutilities</artifactId>
+			<version>1.0</version>
 			<scope>system</scope>
-			<systemPath>${project.basedir}/libs/SigningUtilities.jar</systemPath>
+			<systemPath>${project.basedir}/libs/signingutilities.jar</systemPath>
 		</dependency>
 	</dependencies>
 	<build>
