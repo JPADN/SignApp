@@ -1,7 +1,9 @@
 package com.api.signapp.controllers;
 
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.desafiobry.exceptions.SignatureVerificationException;
 import org.desafiobry.exceptions.SigningException;
 import org.desafiobry.signingutilities.SignerCertKey;
@@ -23,6 +25,19 @@ import java.util.Base64;
 @RequestMapping("/")
 public class SignAppController {
 
+    SigningUtilities signingUtilities;
+
+    public SignAppController() {
+        try {
+            this.signingUtilities = new SigningUtilities(new SHA256Digest(), "SHA256WithRSA", new JcaDigestCalculatorProviderBuilder().setProvider("BC").build());
+        } catch (OperatorCreationException e) {
+            // Could not build DigestCalculatorProvider from Bouncy Castle library
+            System.exit(1);
+        }
+    }
+
+    // signFile signs the document present in 'file' with the certificate and private key provided by pfx and protected
+    // under 'password'.
     @PostMapping("/signature")
     public ResponseEntity<Object> signFile(@RequestPart("file") MultipartFile file,
                                            @RequestPart("pfx") MultipartFile pfx,
@@ -44,7 +59,9 @@ public class SignAppController {
         }
 
         try {
-            // Quando o certificado e chave do arquivo .pfx não possuem alias, o alias utilizado é "1".
+            // Visto que o corpo da requisição especificado pelo desafio não contém um campo para o alias,
+            // supõe-se que o certificado e chave privada presente no arquivo .pfx não possuem alias.
+            // Quando o .pfx não possui um alias, o alias padrão é "1"
             signerCertKey = SigningUtilities.loadCertKeyFromPKCS12(pfxBytes, "1",password.toCharArray());
         } catch (IOException e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not load keystore data. Check if " +
@@ -74,7 +91,8 @@ public class SignAppController {
         }
 
         try {
-            byte[] signature = SigningUtilities.signData(fileBytes, signerKey, signerCertificate);
+            byte[] signature = signingUtilities.signData(fileBytes, signerKey, signerCertificate);
+            // Codificando a assinatura para o formato Base64.
             String base64Signature = Base64.getEncoder().encodeToString(signature);
             return ResponseEntity.status(HttpStatus.OK).body(base64Signature);
         } catch (OperatorCreationException e) {
@@ -87,6 +105,7 @@ public class SignAppController {
         }
     }
 
+    // verifySignature verifica a assinatura do arquivo assinado 'signedFile'.
     @PostMapping("/verify")
     public ResponseEntity<Object> verifySignature(@RequestPart("file") MultipartFile signedFile) {
         byte[] signedFileBytes;
