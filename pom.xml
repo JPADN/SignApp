@@ -44,6 +44,7 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>3.0.4</version>
 				<configuration>
 					<includeSystemScope>true</includeSystemScope>
 					<mainClass>com.api.signapp.SignappApplication</mainClass>
