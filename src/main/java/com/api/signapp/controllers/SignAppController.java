@@ -28,7 +28,8 @@ import java.util.Base64;
 @RequestMapping("/")
 public class SignAppController {
 
-    SigningUtilities signingUtilities;
+    private SigningUtilities signingUtilities;
+
     public SignAppController() {
         try {
             this.signingUtilities = new SigningUtilities(new SHA256Digest(), new JcaContentSignerBuilder("SHA256WithRSA"),
