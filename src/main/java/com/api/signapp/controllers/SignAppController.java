@@ -1,8 +1,11 @@
 package com.api.signapp.controllers;
 
 import org.bouncycastle.cms.CMSException;
+import org.bouncycastle.cms.jcajce.JcaSignerInfoGeneratorBuilder;
+import org.bouncycastle.cms.jcajce.JcaSimpleSignerInfoVerifierBuilder;
 import org.bouncycastle.crypto.digests.SHA256Digest;
 import org.bouncycastle.operator.OperatorCreationException;
+import org.bouncycastle.operator.jcajce.JcaContentSignerBuilder;
 import org.bouncycastle.operator.jcajce.JcaDigestCalculatorProviderBuilder;
 import org.desafiobry.exceptions.SignatureVerificationException;
 import org.desafiobry.exceptions.SigningException;
@@ -26,10 +29,11 @@ import java.util.Base64;
 public class SignAppController {
 
     SigningUtilities signingUtilities;
-
     public SignAppController() {
         try {
-            this.signingUtilities = new SigningUtilities(new SHA256Digest(), "SHA256WithRSA", new JcaDigestCalculatorProviderBuilder().setProvider("BC").build());
+            this.signingUtilities = new SigningUtilities(new SHA256Digest(), new JcaContentSignerBuilder("SHA256WithRSA"),
+                new JcaSignerInfoGeneratorBuilder(new JcaDigestCalculatorProviderBuilder().setProvider("BC").build()),
+                new JcaSimpleSignerInfoVerifierBuilder());
         } catch (OperatorCreationException e) {
             // Could not build DigestCalculatorProvider from Bouncy Castle library
             System.exit(1);
@@ -118,7 +122,7 @@ public class SignAppController {
         }
 
         try {
-            validSignature = SigningUtilities.verifySignature(signedFileBytes);
+            validSignature = signingUtilities.verifySignature(signedFileBytes);
         } catch (OperatorCreationException e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal error during signature operation.");
         } catch (CertificateException e) {
